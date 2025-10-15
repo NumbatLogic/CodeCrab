@@ -185,70 +185,71 @@
 
 	function ParseDirectory($sDirectory)
 	{
-		$pDirectory = opendir($sDirectory);
-			while($sFile = readdir($pDirectory))
+		$sFileArray = scandir($sDirectory);
+		sort($sFileArray);
+
+		foreach ($sFileArray as $sFile)
+		{
+			if ($sFile != "." && $sFile != "..")
 			{
-				if ($sFile != "." && $sFile != "..")
+				if (is_dir($sDirectory . "/" . $sFile))
 				{
-					if (is_dir($sDirectory . "/" . $sFile))
-					{
-						if ($sFile == "ThirdParty")
-							continue;
-						
-						ParseDirectory($sDirectory . "/" . $sFile);
+					if ($sFile == "ThirdParty")
 						continue;
-					}
 					
-					$sExtension = strtolower(pathinfo($sFile, PATHINFO_EXTENSION));
-					//$sBaseName = 
-					
-					$sCurrentFile = $sDirectory . "/" . $sFile;
-					$sHeaderFile = $sDirectory . "/" . pathinfo($sFile, PATHINFO_FILENAME) . ".h";
-					$sSourceFile = $sDirectory . "/" . pathinfo($sFile, PATHINFO_FILENAME) . ".c";
-					$sSourceFileCpp = $sDirectory . "/" . pathinfo($sFile, PATHINFO_FILENAME) . ".cpp";
-					$sSourceFileNll = $sDirectory . "/" . pathinfo($sFile, PATHINFO_FILENAME) . ".nll";
-					
-					if ($sCurrentFile == $sHeaderFile)
-					{
-						ParseFile($sHeaderFile);
-						if (file_exists($sSourceFile))
-							ParseFile($sSourceFile);
-						if (file_exists($sSourceFileCpp))
-							ParseFile($sSourceFileCpp);
-					}
-					else if ($sCurrentFile == $sSourceFile)
-					{
-						if (!file_exists($sHeaderFile))
-							ParseFile($sSourceFile);
-					}
-					else if ($sCurrentFile == $sSourceFileCpp)
-					{
-						if (!file_exists($sHeaderFile))
-							ParseFile($sSourceFileCpp);
-					}
-					else if ($sCurrentFile == $sSourceFileNll)
-					{
-						ParseFile($sSourceFileNll);
-					}
+					ParseDirectory($sDirectory . "/" . $sFile);
+					continue;
+				}
+				
+				$sExtension = strtolower(pathinfo($sFile, PATHINFO_EXTENSION));
+				//$sBaseName = 
+				
+				$sCurrentFile = $sDirectory . "/" . $sFile;
+				$sHeaderFile = $sDirectory . "/" . pathinfo($sFile, PATHINFO_FILENAME) . ".h";
+				$sSourceFile = $sDirectory . "/" . pathinfo($sFile, PATHINFO_FILENAME) . ".c";
+				$sSourceFileCpp = $sDirectory . "/" . pathinfo($sFile, PATHINFO_FILENAME) . ".cpp";
+				$sSourceFileNll = $sDirectory . "/" . pathinfo($sFile, PATHINFO_FILENAME) . ".nll";
+				
+				if ($sCurrentFile == $sHeaderFile)
+				{
+					ParseFile($sHeaderFile);
+					if (file_exists($sSourceFile))
+						ParseFile($sSourceFile);
+					if (file_exists($sSourceFileCpp))
+						ParseFile($sSourceFileCpp);
+				}
+				else if ($sCurrentFile == $sSourceFile)
+				{
+					if (!file_exists($sHeaderFile))
+						ParseFile($sSourceFile);
+				}
+				else if ($sCurrentFile == $sSourceFileCpp)
+				{
+					if (!file_exists($sHeaderFile))
+						ParseFile($sSourceFileCpp);
+				}
+				else if ($sCurrentFile == $sSourceFileNll)
+				{
+					ParseFile($sSourceFileNll);
+				}
 
 
+				
+				//echo $sHeaderFile . "\n";
+				//echo $sSourceFile . "\n\n";
+				
+				//if ($sExtension == "h") // ||*/ $sExtension == "c")
+				//{
+				//	ParseFile($sHeaderFile);
+				//	if (file_exists($sSourceFile))
+				//		ParseFile($sSourceFile);
 					
 					//echo $sHeaderFile . "\n";
 					//echo $sSourceFile . "\n\n";
-					
-					//if ($sExtension == "h") // ||*/ $sExtension == "c")
-					//{
-					//	ParseFile($sHeaderFile);
-					//	if (file_exists($sSourceFile))
-					//		ParseFile($sSourceFile);
-						
-						//echo $sHeaderFile . "\n";
-						//echo $sSourceFile . "\n\n";
-						//echo $sFile . "\n";	
-					//}
-				}
+					//echo $sFile . "\n";	
+				//}
 			}
-		closedir($pDirectory);
+		}
 	}
 
 	$nParameterIndex = 1;
